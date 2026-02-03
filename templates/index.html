@@ -4,7 +4,7 @@ endblock %} {% block content %}
 <div class="header-section">
   <h2>Student Records</h2>
   <div class="search-box">
-    <form action="{{ url_for('search_student') }}" method="get">
+    <form action="{{ url_for('search_student_route') }}" method="get">
       <input
         type="text"
         name="q"
@@ -45,12 +45,12 @@ endblock %} {% block content %}
         <td>{{ student.level }}</td>
         <td class="actions">
           <a
-            href="{{ url_for('edit_student', reg_number=student.reg_number) }}"
+            href="{{ url_for('edit_student_route', reg_number=student.reg_number) }}"
             class="btn-edit"
             >✏️ Edit</a
           >
           <form
-            action="{{ url_for('delete_student', reg_number=student.reg_number) }}"
+            action="{{ url_for('delete_student_route', reg_number=student.reg_number) }}"
             method="post"
             style="display: inline"
             onsubmit="
@@ -71,6 +71,8 @@ endblock %} {% block content %}
 <div class="empty-state">
   <h3>📚 No student records found</h3>
   <p>Start by adding your first student record.</p>
-  <a href="{{ url_for('add_student') }}" class="btn-primary">Add New Student</a>
+  <a href="{{ url_for('add_student_route') }}" class="btn-primary"
+    >Add New Student</a
+  >
 </div>
 {% endif %} {% endblock %}

@@ -4,5 +4,11 @@
         "reg_number": "u2023/5570017",
         "department": "comp sci",
         "level": "300"
+    },
+    {
+        "name": "maruu",
+        "reg_number": "u2023/5570012",
+        "department": "comp scii",
+        "level": "200"
     }
 ]
