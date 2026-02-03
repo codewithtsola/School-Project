@@ -137,6 +137,30 @@ class Database:
                 return Student.from_dict(student_data)
         return None
     
+    def search_students(self, query):
+        """
+        Search for students by name, registration number, department, or level
+        
+        Args:
+            query (str): Search query
+            
+        Returns:
+            list: List of Student objects matching the query
+        """
+        data = self._load_data()
+        results = []
+        query_lower = query.lower().strip()
+        
+        for student_data in data:
+            # Search in name, registration number, department, and level
+            if (query_lower in student_data.get('name', '').lower() or
+                query_lower in student_data.get('reg_number', '').lower() or
+                query_lower in student_data.get('department', '').lower() or
+                query_lower in student_data.get('level', '').lower()):
+                results.append(Student.from_dict(student_data))
+        
+        return results
+    
     def update_student(self, reg_number, updated_student):
         """
         Update an existing student record
