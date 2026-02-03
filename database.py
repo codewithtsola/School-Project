@@ -38,6 +38,19 @@ class Database:
         if not os.path.exists(self.data_file):
             with open(self.data_file, 'w') as f:
                 json.dump([], f)
+        else:
+            # Verify the file contains valid JSON
+            try:
+                with open(self.data_file, 'r') as f:
+                    data = json.load(f)
+                    # If it's not a list, reset it
+                    if not isinstance(data, list):
+                        with open(self.data_file, 'w') as f:
+                            json.dump([], f)
+            except json.JSONDecodeError:
+                # File is corrupted, reset it
+                with open(self.data_file, 'w') as f:
+                    json.dump([], f)
     
     def _load_data(self):
         """
@@ -48,8 +61,16 @@ class Database:
         """
         try:
             with open(self.data_file, 'r') as f:
-                return json.load(f)
-        except (json.JSONDecodeError, FileNotFoundError):
+                content = f.read().strip()
+                if not content:  # Empty file
+                    return []
+                data = json.loads(content)
+                # Ensure it's a list
+                if not isinstance(data, list):
+                    return []
+                return data
+        except (json.JSONDecodeError, FileNotFoundError) as e:
+            print(f"Error loading data: {e}")
             return []
     
     def _save_data(self, data):
@@ -83,8 +104,9 @@ class Database:
         data = self._load_data()
         
         # Check if registration number already exists
-        if any(s['reg_number'] == student.reg_number for s in data):
-            return False
+        for existing_student in data:
+            if existing_student.get('reg_number') == student.reg_number:
+                return False
         
         data.append(student.to_dict())
         return self._save_data(data)
@@ -111,9 +133,33 @@ class Database:
         """
         data = self._load_data()
         for student_data in data:
-            if student_data['reg_number'] == reg_number:
+            if student_data.get('reg_number') == reg_number:
                 return Student.from_dict(student_data)
         return None
+    
+    def search_students(self, query):
+        """
+        Search for students by name, registration number, department, or level
+        
+        Args:
+            query (str): Search query
+            
+        Returns:
+            list: List of Student objects matching the query
+        """
+        data = self._load_data()
+        results = []
+        query_lower = query.lower().strip()
+        
+        for student_data in data:
+            # Search in name, registration number, department, and level
+            if (query_lower in student_data.get('name', '').lower() or
+                query_lower in student_data.get('reg_number', '').lower() or
+                query_lower in student_data.get('department', '').lower() or
+                query_lower in student_data.get('level', '').lower()):
+                results.append(Student.from_dict(student_data))
+        
+        return results
     
     def update_student(self, reg_number, updated_student):
         """
@@ -129,7 +175,7 @@ class Database:
         data = self._load_data()
         
         for i, student_data in enumerate(data):
-            if student_data['reg_number'] == reg_number:
+            if student_data.get('reg_number') == reg_number:
                 data[i] = updated_student.to_dict()
                 return self._save_data(data)
         
@@ -148,7 +194,7 @@ class Database:
         data = self._load_data()
         original_length = len(data)
         
-        data = [s for s in data if s['reg_number'] != reg_number]
+        data = [s for s in data if s.get('reg_number') != reg_number]
         
         if len(data) < original_length:
             return self._save_data(data)
