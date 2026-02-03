@@ -92,11 +92,11 @@ def search_student():
     if not query:
         return redirect(url_for('index'))
     
-    student = db.get_student(query)
-    students = [student] if student else []
+    # Use the new search_students method instead
+    students = db.search_students(query)
     
-    if not student:
-        flash(f'No student found with registration number: {query}', 'warning')
+    if not students:
+        flash(f'No students found matching: {query}', 'warning')
     
     return render_template('index.html', students=students, search_query=query)
 
