@@ -103,20 +103,13 @@ class Database:
         """
         data = self._load_data()
         
-        # Debug: Print current data
-        print(f"Current data in database: {data}")
-        print(f"Trying to add student with reg_number: {student.reg_number}")
-        
         # Check if registration number already exists
         for existing_student in data:
             if existing_student.get('reg_number') == student.reg_number:
-                print(f"Found duplicate: {existing_student}")
                 return False
         
         data.append(student.to_dict())
-        result = self._save_data(data)
-        print(f"Save result: {result}")
-        return result
+        return self._save_data(data)
     
     def get_all_students(self):
         """
@@ -140,7 +133,7 @@ class Database:
         """
         data = self._load_data()
         for student_data in data:
-            if student_data.get('reg_number') == student.reg_number:
+            if student_data.get('reg_number') == reg_number:
                 return Student.from_dict(student_data)
         return None
     
